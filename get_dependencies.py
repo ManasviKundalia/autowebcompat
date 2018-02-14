@@ -7,22 +7,24 @@ from rfc6266 import parse_requests_response
 
 
 def download(url):
-    response = requests.get(url)
-
-    try:
-        cd = response.headers['content-disposition']
-        extnsn = cd[cd.rfind('.')+1:]
-        filename = parse_requests_response(response).filename_sanitized(extnsn)   
-    except:
-        #get base name of file from url
-        start = url.rfind('/')+1
-        end = url.find('?')
-        if end==-1:
-            end = len(url)
-        filename = url[start:end] 
-        if filename.rfind('.')==-1:     #check for valid filenames
-            print('Couldn\'t get filename for this url')
-            return
+    response = requests.get(url)    
+    filename = parse_requests_response(response).filename_unsafe   
+    
+    # sanitize from filename_sanitized of the rfc6266 package except the extension part
+    default_filename = 'file'
+    if filename is None:
+        filename = default_filename
+    filename = posixpath.basename(filename)
+    filename = os.path.basename(filename)
+    filename = filename.lstrip('.')
+    
+    if not filename:
+        filename = default_filename
+        
+    if filename.rfind('.')==-1:     #check for valid filenames
+        print('Couldn\'t get filename for this url')
+        return
+    
     with open(filename, 'wb') as f:
         response = requests.get(url, stream=True)
         total = response.headers.get('content-length')
