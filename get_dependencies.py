@@ -3,18 +3,24 @@ import os
 import tarfile
 from zipfile import ZipFile
 import requests
-from rfc6266 import parse_headers
+from rfc6266 import parse_requests_response
 
 
 def download(url):
     response = requests.get(url)
     cd = response.headers['content-disposition']
-    filename = parse_headers(cd).filename_unsafe
     
-    if not filename:
-        print('Couldn\'t get filename for this url')
-        return 
+    if not cd:
+        #get base name of file from url
+        filename = url[url.rfind('/')+1:url.find('?')] 
+        if filename.rfind('.')==-1:     #check for valid filenames
+            print('Couldn\'t get filename for this url')
+            return
+        return filename
     
+    extnsn = cd[cd.rfind('.')+1:]
+    filename = parse_requests_response(cd).filename_sanitized(extnsn)   
+  
     with open(filename, 'wb') as f:
         response = requests.get(url, stream=True)
         total = response.headers.get('content-length')
