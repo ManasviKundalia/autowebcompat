@@ -35,7 +35,7 @@ def download(url):
                 sys.stdout.write('\r[{}{}]'.format('█' * done, '.' * (50 - done)))
                 sys.stdout.flush()
                 sys.stdout.write('\n')
-    return filename
+    
     return filename
 
 
@@ -64,7 +64,7 @@ print('[*] Extracting data.zip...')
 try:
     with ZipFile('data.zip', 'r') as z:
         z.extractall()
-except BadZipfile:
+except:
     print('BAD ZIP FILE')
 
 os.remove('data.zip')
