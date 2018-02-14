@@ -15,7 +15,11 @@ def download(url):
         filename = parse_requests_response(response).filename_sanitized(extnsn)   
     except:
         #get base name of file from url
-        filename = url[url.rfind('/')+1:url.find('?')] 
+        start = url.rfind('/')+1
+        end = url.find('?')
+        if end==-1:
+            end = len(url)
+        filename = url[start:end] 
         if filename.rfind('.')==-1:     #check for valid filenames
             print('Couldn\'t get filename for this url')
             return
